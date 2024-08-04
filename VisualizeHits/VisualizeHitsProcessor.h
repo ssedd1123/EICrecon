@@ -15,7 +15,7 @@ private:
     struct HitInfo {double x, y, z; int charge, time; };
     const dd4hep::Detector* _detector                     = nullptr;
     std::unique_ptr<dd4hep::rec::CellIDPositionConverter> _converter;
-    std::vector<HitInfo> _hits;
+    std::vector<HitInfo> _hits, _geantHits, _recoHits;
 
     // It generates a root file "geo.root"
     // To draw everything, open the file with root, when enter the following in the command line
