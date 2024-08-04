@@ -9,6 +9,8 @@
 
 // Include appropriate class headers. e.g.
 #include <edm4eic/RawTrackerHitCollection.h>
+#include <edm4eic/TrackerHitCollection.h>
+#include <edm4hep/SimTrackerHitCollection.h>
 
 #include "TGeoMatrix.h"
 #include "TColor.h"
@@ -45,6 +47,18 @@ void VisualizeHitsProcessor::ProcessSequential(const std::shared_ptr<const JEven
 	auto cellID = hit.getCellID();
         auto pos = _converter -> position(cellID);
 	_hits.push_back({pos.X(), pos.Y(), pos.Z(), hit.getCharge(), hit.getTimeStamp()});
+    }
+
+    const auto &truehits = *(event->GetCollection<edm4hep::SimTrackerHit>("TOFBarrelHits"));
+    for(auto hit : truehits) {
+        auto pos = hit.getPosition();
+	_geantHits.push_back({pos.x/10, pos.y/10, pos.z/10, 0, 0});
+    }
+
+    const auto &recohits = *(event->GetCollection<edm4eic::TrackerHit>("TOFBarrelRecHit"));
+    for(auto hit : recohits) {
+        auto pos = hit.getPosition();
+	_recoHits.push_back({pos.x/10, pos.y/10, pos.z/10, 0, 0});
     }
 
     // Fill histograms here. e.g.
@@ -85,6 +99,40 @@ void VisualizeHitsProcessor::Export3DNeighbors(int nNeighbors, const std::string
     hitGeo -> SetLineColor(colors[int(double(hit.charge)/maxCharge -> charge*colors.size())]);//TColor::GetColor(std::min(255, int((hit.charge/1000.)*255)), 0, 0));
     volume->AddNode(hitGeo, 1, new TGeoTranslation(x, y, z));
   }
+
+  for (const auto& hit : _geantHits) {
+    double x = hit.x;
+    double y = hit.y;
+    double z = hit.z;
+
+    // find volume
+    auto node     = manager->FindNode(x, y, z);
+    auto HMatrix  = manager->GetCurrentMatrix();
+    auto rotation = new TGeoRotation();
+    rotation->SetMatrix(HMatrix->GetRotationMatrix());
+
+    auto hitGeo = manager->MakeSphere("Hits", Vacuum, 0., 0.2);
+    hitGeo -> SetLineColor(kGreen);
+    volume->AddNode(hitGeo, 1, new TGeoTranslation(x, y, z));
+  }
+
+  for (const auto& hit : _recoHits) {
+    double x = hit.x;
+    double y = hit.y;
+    double z = hit.z;
+
+    // find volume
+    auto node     = manager->FindNode(x, y, z);
+    auto HMatrix  = manager->GetCurrentMatrix();
+    auto rotation = new TGeoRotation();
+    rotation->SetMatrix(HMatrix->GetRotationMatrix());
+
+    auto hitGeo = manager->MakeSphere("Hits", Vacuum, 0., 0.2);
+    hitGeo -> SetLineColor(kBlue);
+    volume->AddNode(hitGeo, 1, new TGeoTranslation(x, y, z));
+  }
+
+
 
   manager->Export(filename.c_str());
 }
