@@ -13,6 +13,7 @@
 class VisualizeHitsProcessor: public JEventProcessorSequentialRoot {
 private:
     struct HitInfo {double x, y, z; int charge, time; };
+    std::vector<double>     _cellDim;
     const dd4hep::Detector* _detector                     = nullptr;
     std::unique_ptr<dd4hep::rec::CellIDPositionConverter> _converter;
     std::vector<HitInfo> _hits, _geantHits, _recoHits;

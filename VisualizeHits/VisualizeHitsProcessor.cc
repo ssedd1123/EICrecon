@@ -46,6 +46,8 @@ void VisualizeHitsProcessor::ProcessSequential(const std::shared_ptr<const JEven
     for(auto hit: rawhits) {
 	auto cellID = hit.getCellID();
         auto pos = _converter -> position(cellID);
+	if(_cellDim.size() ==  0) 
+	    _cellDim = _converter -> cellDimensions(cellID);
 	_hits.push_back({pos.X(), pos.Y(), pos.Z(), hit.getCharge(), hit.getTimeStamp()});
     }
 
@@ -95,7 +97,7 @@ void VisualizeHitsProcessor::Export3DNeighbors(int nNeighbors, const std::string
     auto rotation = new TGeoRotation();
     rotation->SetMatrix(HMatrix->GetRotationMatrix());
 
-    auto hitGeo = manager->MakeBox("Hits", Vacuum, 0.025, 0.5, 0.05);
+    auto hitGeo = manager->MakeBox("Hits", Vacuum, _cellDim[0]/2., _cellDim[1]/2, 0.05);
     hitGeo -> SetLineColor(colors[int(double(hit.charge)/maxCharge -> charge*colors.size())]);//TColor::GetColor(std::min(255, int((hit.charge/1000.)*255)), 0, 0));
     volume->AddNode(hitGeo, 1, new TGeoCombiTrans(x, y, z, rotation));
   }
