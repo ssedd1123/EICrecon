@@ -98,7 +98,7 @@ void VisualizeHitsProcessor::Export3DNeighbors(int nNeighbors, const std::string
     rotation->SetMatrix(HMatrix->GetRotationMatrix());
 
     auto hitGeo = manager->MakeBox("Hits", Vacuum, _cellDim[0]/2., _cellDim[1]/2, 0.05);
-    hitGeo -> SetLineColor(colors[int(double(hit.charge)/maxCharge -> charge*colors.size())]);//TColor::GetColor(std::min(255, int((hit.charge/1000.)*255)), 0, 0));
+    hitGeo -> SetLineColor(colors[std::max(int(colors.size())-1, int(double(hit.charge)/maxCharge -> charge*colors.size()))]);//TColor::GetColor(std::min(255, int((hit.charge/1000.)*255)), 0, 0));
     volume->AddNode(hitGeo, 1, new TGeoCombiTrans(x, y, z, rotation));
   }
 
