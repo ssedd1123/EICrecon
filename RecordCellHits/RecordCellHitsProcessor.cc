@@ -41,6 +41,7 @@ void RecordCellHitsProcessor::InitWithGlobalRootLock(){
     _tree -> Branch("simy", &_simy);
     _tree -> Branch("simz", &_simz);
     _tree -> Branch("simc", &_simc);
+    _tree -> Branch("simt", &_simt);
 
     // Create histograms here. e.g.
     _detector = GetApplication() -> GetService<DD4hep_service>() -> detector();
@@ -64,6 +65,7 @@ void RecordCellHitsProcessor::ProcessSequential(const std::shared_ptr<const JEve
 	_simy = pos.y;
 	_simz = pos.z;
 	_simc = hit.getEDep();
+	_simt = hit.getTime();
     }
 
     _cellID.clear();

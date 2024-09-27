@@ -23,7 +23,7 @@ private:
     std::vector<double> _ADC;
     std::vector<double> _x, _y, _z;
     double _simx, _simy, _simz;
-    double _simc;
+    double _simc, _simt;
     int _eventID;
 
     const dd4hep::Detector* _detector                     = nullptr;
