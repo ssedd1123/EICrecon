@@ -7,6 +7,7 @@
 #include <Math/GenVector/Cartesian3D.h>
 #include <Math/GenVector/DisplacementVector3D.h>
 #include <edm4eic/CovDiag3f.h>
+#include <edm4eic/Cov3f.h>
 #include <edm4hep/Vector3f.h>
 #include <fmt/core.h>
 #include <spdlog/common.h>
@@ -15,13 +16,18 @@
 #include <utility>
 #include <vector>
 
+#include "TMatrixT.h"
+
 namespace eicrecon {
 
-void BTOFHitReconstruction::init(const dd4hep::rec::CellIDPositionConverter* converter, std::shared_ptr<spdlog::logger>& logger) {
+void BTOFHitReconstruction::init(const dd4hep::rec::CellIDPositionConverter* converter, 
+		                 const dd4hep::Detector* detector,
+				 std::shared_ptr<spdlog::logger>& logger) {
 
     m_log = logger;
 
     m_converter = converter;
+    m_detector = detector;
 }
 
 dd4hep::rec::CellID BTOFHitReconstruction::getDetInfos(const dd4hep::rec::CellID& id) {
@@ -63,6 +69,8 @@ std::unique_ptr<edm4eic::TrackerHitCollection> BTOFHitReconstruction::process(co
 
     }
 
+    auto geoManager = m_detector -> world().volume() -> GetGeoManager();
+
     // loop through each sensors for Hit information
     for (const auto& sensor : hitsBySensors) {
 	// INSERT clustering algorithm for each sensors here
@@ -94,17 +102,42 @@ std::unique_ptr<edm4eic::TrackerHitCollection> BTOFHitReconstruction::process(co
 	ave_y /= tot_charge;
 	ave_z /= tot_charge;
 
+	auto cellSize = m_converter -> cellDimensions(id);
 
+	// get rotation matrix
+	auto node = geoManager -> FindNode(hits[0].x, hits[0].y, hits[0].z);
+	auto currMatrix = geoManager -> GetCurrentMatrix();
+	auto rotMatrixElements = currMatrix -> GetRotationMatrix();
+
+	// rotMatrix transforms local coordinates to global coordinates
+	// see line 342 of https://root.cern.ch/doc/master/TGeoMatrix_8cxx_source.html#l00342
+	TMatrixT<double> rot(3, 3, rotMatrixElements);
+	TMatrixT<double> rotT(3, 3);
+	rotT.Transpose(rot);
+
+	TMatrixT<double> varLocal(3, 1);
+	varLocal[0][0] = cellSize[0]*cellSize[0] / mm / mm;
+	varLocal[0][1] = cellSize[1]*cellSize[1] / mm / mm;
+	varLocal[0][2] = 0;
+
+	// transform variance. see https://robotics.stackexchange.com/questions/2556/how-to-rotate-covariance
+	auto varGlobal = rot*varLocal*rotT;
+
+
+	// adc to charge
+	float charge = tot_charge * m_cfg.c_slope + m_cfg.c_intercept;
+	// TDC to time
+	float time = first_tdc * m_cfg.t_slope + m_cfg.t_intercept;
         // >oO trace
         rec_hits->create(
 	    id,
             edm4hep::Vector3f{static_cast<float>(ave_x / mm), 
 	                      static_cast<float>(ave_y / mm), 
 			      static_cast<float>(ave_z / mm)}, // mm
-            edm4eic::CovDiag3f{1./mm, 1./mm, 1./mm}, // should be the covariance of position
-            static_cast<float>((double)(first_tdc)), // ns
+            edm4eic::CovDiag3f{varGlobal[0][0], varGlobal[1][1], varGlobal[2][2]}, // should be the covariance of position
+            time, // ns
             0.0F,                            // covariance of time
-            static_cast<float>(tot_charge / 1000.),   // total ADC sum
+            charge,   // total ADC sum
             0.0F);                                       // Error on the energy
 
     }

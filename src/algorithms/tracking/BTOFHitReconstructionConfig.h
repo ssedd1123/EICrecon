@@ -5,5 +5,9 @@
 
 namespace eicrecon {
     struct BTOFHitReconstructionConfig {
+        // parameters that convert ADC to EDep
+	double c_slope = 0, c_intercept = 0;
+	// parameters that convert TDC to hit time (ns)
+	double t_slope = 0, t_intercept = 0;
     };
 }

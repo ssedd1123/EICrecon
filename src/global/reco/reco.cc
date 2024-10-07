@@ -407,6 +407,7 @@ void InitPlugin(JApplication *app) {
             {"TOFBarrelADCTDC"},
             {},
             app
+	    ));
 
 
 }

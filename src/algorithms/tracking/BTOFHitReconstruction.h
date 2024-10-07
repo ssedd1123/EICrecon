@@ -4,6 +4,7 @@
 #pragma once
 
 #include <DDRec/CellIDPositionConverter.h>
+#include <DD4hep/Detector.h>
 #include <edm4eic/RawTrackerHitCollection.h>
 #include <edm4eic/TrackerHitCollection.h>
 #include <spdlog/logger.h>
@@ -21,7 +22,7 @@ namespace eicrecon {
 
     public:
         /// Once in a lifetime initialization
-        void init(const dd4hep::rec::CellIDPositionConverter* converter, std::shared_ptr<spdlog::logger>& logger);
+        void init(const dd4hep::rec::CellIDPositionConverter* converter, const dd4hep::Detector* detector, std::shared_ptr<spdlog::logger>& logger);
 
         /// Processes RawTrackerHit and produces a TrackerHit
         std::unique_ptr<edm4eic::TrackerHitCollection> process(const edm4eic::RawTrackerHitCollection& TDCADC_hits);
@@ -37,5 +38,7 @@ namespace eicrecon {
 
 	/// fetch sensor information from cellID
 	const dd4hep::DDSegmentation::BitFieldCoder* m_decoder = nullptr;
+
+	const dd4hep::Detector* m_detector = nullptr;
     };
 }

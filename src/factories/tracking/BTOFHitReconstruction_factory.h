@@ -22,7 +22,7 @@ public JOmniFactory<BTOFHitReconstruction_factory, BTOFHitReconstructionConfig> 
 public:
     void Configure() {
         m_algo.applyConfig(config());
-        m_algo.init(m_geoSvc().converter(), logger());
+        m_algo.init(m_geoSvc().converter(), m_geoSvc().detector(), logger());
     }
 
     void ChangeRun(int64_t run_number) {
