@@ -407,8 +407,7 @@ void InitPlugin(JApplication *app) {
             {"TOFBarrelADCTDC"},
             {},
             app
-	    ));
-
+    ));
 
 }
 } // extern "C"
