@@ -72,6 +72,11 @@ std::unique_ptr<edm4eic::TrackerHitCollection> BTOFHitReconstruction::process(co
     auto geoManager = m_detector -> world().volume() -> GetGeoManager();
 
     // loop through each sensors for Hit information
+    TMatrixT<double> varLocal(3, 3);
+    for(int i = 0; i < 3; ++i)
+	    for(int j = 0; j < 3; ++j)
+		    varLocal[i][j] = 0;
+
     for (const auto& sensor : hitsBySensors) {
 	// INSERT clustering algorithm for each sensors here
 	// Right now I just perform a simple average over all hits in a sensors
@@ -115,10 +120,9 @@ std::unique_ptr<edm4eic::TrackerHitCollection> BTOFHitReconstruction::process(co
 	TMatrixT<double> rotT(3, 3);
 	rotT.Transpose(rot);
 
-	TMatrixT<double> varLocal(3, 1);
 	varLocal[0][0] = cellSize[0]*cellSize[0] / mm / mm;
-	varLocal[0][1] = cellSize[1]*cellSize[1] / mm / mm;
-	varLocal[0][2] = 0;
+	varLocal[1][1] = cellSize[1]*cellSize[1] / mm / mm;
+	varLocal[2][2] = 0;
 
 	// transform variance. see https://robotics.stackexchange.com/questions/2556/how-to-rotate-covariance
 	auto varGlobal = rot*varLocal*rotT;
