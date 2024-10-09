@@ -182,8 +182,11 @@ std::unique_ptr<edm4eic::RawTrackerHitCollection> BTOFHitDigi::execute(const edm
 
                  
                
-                adc = round(-V);
-                rawhits -> create(neighbour, adc, tdc);
+		// limit the range of adc values
+                adc = std::min(static_cast<double>(adc_range), round(-V));
+		// only store valid hits
+		if(tdc < std::numeric_limits<int>::max())
+                    rawhits -> create(neighbour, adc, tdc);
 
             }
 //-----------------------------------------------------------

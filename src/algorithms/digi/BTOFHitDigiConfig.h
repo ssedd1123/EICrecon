@@ -24,7 +24,7 @@ namespace eicrecon {
     double sigma_sharingx = 0.1;
     double sigma_sharingy = 0.5;
     double Vm = -1e-4*gain;
-    double t_thres = 0.01*Vm;
+    double t_thres = 0.1*Vm;
  
   };
 

@@ -120,8 +120,8 @@ std::unique_ptr<edm4eic::TrackerHitCollection> BTOFHitReconstruction::process(co
 	TMatrixT<double> rotT(3, 3);
 	rotT.Transpose(rot);
 
-	varLocal[0][0] = cellSize[0]*cellSize[0] / mm / mm;
-	varLocal[1][1] = cellSize[1]*cellSize[1] / mm / mm;
+	varLocal[0][0] = cellSize[0]*cellSize[0] / mm / mm / 12.; // final division by 12 because I assumed uniform distribution
+	varLocal[1][1] = cellSize[1]*cellSize[1] / mm / mm / 12.; // Std. dev of uniformation = width/sqrt(12)
 	varLocal[2][2] = 0;
 
 	// transform variance. see https://robotics.stackexchange.com/questions/2556/how-to-rotate-covariance

@@ -24,6 +24,10 @@ private:
     std::vector<double> _x, _y, _z;
     double _simx, _simy, _simz;
     double _simc, _simt;
+    double _recx, _recy, _recz;
+    double _recerrx, _recerry, _recerrz;
+    double _recc, _rect;
+
     int _eventID;
 
     const dd4hep::Detector* _detector                     = nullptr;
