@@ -78,6 +78,8 @@ void RecordCellHitsProcessor::ProcessSequential(const std::shared_ptr<const JEve
     }
 
     const auto &rechits = *(event->GetCollection<edm4eic::TrackerHit>("TOFBarrelRecHit"));
+    if(rechits.size() != 1) 
+        return;
     for(auto hit : rechits) {
         auto pos = hit.getPosition();
 	_recx = pos.x;
