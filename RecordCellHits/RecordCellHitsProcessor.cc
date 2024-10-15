@@ -42,6 +42,15 @@ void RecordCellHitsProcessor::InitWithGlobalRootLock(){
     _tree -> Branch("simz", &_simz);
     _tree -> Branch("simc", &_simc);
     _tree -> Branch("simt", &_simt);
+    _tree -> Branch("recx", &_recx);
+    _tree -> Branch("recy", &_recy);
+    _tree -> Branch("recz", &_recz);
+    _tree -> Branch("recc", &_recc);
+    _tree -> Branch("rect", &_rect);
+    _tree -> Branch("recerrx", &_recerrx);
+    _tree -> Branch("recerry", &_recerry);
+    _tree -> Branch("recerrz", &_recerrz);
+
 
     // Create histograms here. e.g.
     _detector = GetApplication() -> GetService<DD4hep_service>() -> detector();
@@ -67,6 +76,25 @@ void RecordCellHitsProcessor::ProcessSequential(const std::shared_ptr<const JEve
 	_simc = hit.getEDep();
 	_simt = hit.getTime();
     }
+
+    const auto &rechits = *(event->GetCollection<edm4eic::TrackerHit>("TOFBarrelRecHit"));
+    if(rechits.size() != 1) 
+        return;
+    for(auto hit : rechits) {
+        auto pos = hit.getPosition();
+	_recx = pos.x;
+	_recy = pos.y;
+	_recz = pos.z;
+	_recc = hit.getEdep();
+	_rect = hit.getTime();
+
+	auto posErr = hit.getPositionError();
+	_recerrx = std::sqrt(posErr.xx);
+	_recerry = std::sqrt(posErr.yy);
+	_recerrz = std::sqrt(posErr.zz);
+    }
+
+
 
     _cellID.clear();
     _TDC.clear();
