@@ -68,9 +68,11 @@ void InitPlugin(JApplication* app) {
 
   app->Add(new JOmniFactoryGeneratorT<TOFPulseDigitization_factory>(
       "BTOFPulseDigitization",
-      {"TOFBarrelPulse"},
-      {"TOFBarrelADCTDC"},
-      {},
+      {"TOFBarrelPulse", "TOFBarrelHits"},
+      {"TOFBarrelADCTDC", "TOFBarrelADCAssociations"},
+      {
+          .readout = "TOFBarrelHits",
+      },
       app
   ));
 

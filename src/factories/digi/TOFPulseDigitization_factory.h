@@ -16,10 +16,12 @@ private:
   std::unique_ptr<eicrecon::TOFPulseDigitization> m_algo;
 
   // Declare inputs
-  PodioInput<edm4hep::RawTimeSeries> m_in_sim_track{this}; //, "TOFBarrelRawHits"};
+  PodioInput<edm4hep::RawTimeSeries> m_in_sim_pulse{this}; //, "TOFBarrelRawHits"};
+  PodioInput<edm4hep::SimTrackerHit> m_in_sim_hits{this}; //, "TOFBarrelRawHits"};
 
   // Declare outputs
   PodioOutput<edm4eic::RawTrackerHit> m_out_reco_particles{this};
+  PodioOutput<edm4eic::MCRecoTrackerHitAssociation> m_assoc_output {this};
 
   // Declare services here, e.g.
   Service<DD4hep_service> m_geoSvc{this};
@@ -51,7 +53,8 @@ public:
     // This is called on every event.
     // Use this callback to call your Algorithm using all inputs and outputs
     // The inputs will have already been fetched for you at this point.
-    m_algo->process({m_in_sim_track()}, {m_out_reco_particles().get()});
+    m_algo->process({m_in_sim_pulse(), m_in_sim_hits()}, 
+		    {m_out_reco_particles().get(), m_assoc_output().get()});
     // JANA will take care of publishing the outputs for you.
   }
 };

@@ -37,6 +37,8 @@ struct TOFHitDigiConfig {
 
   int adc_range = pow(2, adc_bit);
   int tdc_range = pow(2, tdc_bit);
+
+  std::string readout = "";
 };
 
 } // namespace eicrecon

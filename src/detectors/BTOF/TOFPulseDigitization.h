@@ -19,6 +19,8 @@
 #include <algorithms/algorithm.h>
 #include <edm4eic/RawTrackerHitCollection.h>
 #include <edm4hep/RawTimeSeriesCollection.h>
+#include <edm4hep/SimTrackerHitCollection.h>
+#include <edm4eic/MCRecoTrackerHitAssociationCollection.h>
 #include <spdlog/spdlog.h>
 
 #include "DD4hep/Detector.h"
@@ -31,8 +33,10 @@
 namespace eicrecon {
 
 using TOFPulseDigitizationAlgorithm =
-        algorithms::Algorithm<algorithms::Input<edm4hep::RawTimeSeriesCollection>,
-                              algorithms::Output<edm4eic::RawTrackerHitCollection>>;
+        algorithms::Algorithm<algorithms::Input<edm4hep::RawTimeSeriesCollection, 
+	                                        edm4hep::SimTrackerHitCollection>,
+                              algorithms::Output<edm4eic::RawTrackerHitCollection,
+			                         edm4eic::MCRecoTrackerHitAssociationCollection>>;
 
 class TOFPulseDigitization : public TOFPulseDigitizationAlgorithm,
                              public WithPodConfig<TOFHitDigiConfig> {
@@ -43,8 +47,11 @@ public:
                                         {"TOFBarrelPulse"},
                                         {"TOFBarrelADCTDC"},
                                         {}} {}
-  void init() {};
+  void init();
   void process(const Input&, const Output&) const final;
+protected:
+  const dd4hep::DDSegmentation::BitFieldCoder* m_decoder  = nullptr;
+  dd4hep::rec::CellID _getSensorID(const dd4hep::rec::CellID& cellID) const;
 };
 
 } // namespace eicrecon
