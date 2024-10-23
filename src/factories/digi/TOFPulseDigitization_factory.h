@@ -53,8 +53,8 @@ public:
     // This is called on every event.
     // Use this callback to call your Algorithm using all inputs and outputs
     // The inputs will have already been fetched for you at this point.
-    m_algo->process({m_in_sim_pulse(), m_in_sim_hits()}, 
-		    {m_out_reco_particles().get(), m_assoc_output().get()});
+    m_algo->process({m_in_sim_pulse(), m_in_sim_hits()},
+                    {m_out_reco_particles().get(), m_assoc_output().get()});
     // JANA will take care of publishing the outputs for you.
   }
 };

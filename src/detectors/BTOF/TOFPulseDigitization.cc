@@ -48,7 +48,7 @@ void TOFPulseDigitization::init() {
   if (type != "CartesianGridXY")
     throw std::runtime_error("Unsupported segmentation type: " + type +
                              ". TOFPulseDigitization only works with CartesianGridXY."
-			     "It is needed for hit association.");
+                             "It is needed for hit association.");
   // retrieve meaning of cellID bits
   m_decoder = seg.decoder();
 
@@ -61,7 +61,7 @@ void TOFPulseDigitization::process(const TOFPulseDigitization::Input& input,
 
   // prep the association by grouping hits by cellID
   std::unordered_map<dd4hep::rec::CellID, std::vector<edm4hep::SimTrackerHit>> cell_hit_map;
-  for(const auto& sim_hit : *simhits) 
+  for(const auto& sim_hit : *simhits)
     cell_hit_map[this -> _getSensorID(sim_hit.getCellID())].push_back(sim_hit);
 
   double thres = m_cfg.t_thres;
@@ -106,13 +106,13 @@ void TOFPulseDigitization::process(const TOFPulseDigitization::Input& input,
       auto sensorID = this -> _getSensorID(pulse.getCellID());
       auto it = cell_hit_map.find(sensorID);
       if(it != cell_hit_map.end()) {
-	auto n_hits_sensor = static_cast<double>(it -> second.size());
+        auto n_hits_sensor = static_cast<double>(it -> second.size());
         for(const auto sim_hit : it -> second) {
           auto hitassoc = associations -> create();
-	  hitassoc.setWeight(1./n_hits_sensor);
-	  hitassoc.setRawHit(raw_hit);
-	  hitassoc.setSimHit(sim_hit);
-	}
+          hitassoc.setWeight(1./n_hits_sensor);
+          hitassoc.setRawHit(raw_hit);
+          hitassoc.setSimHit(sim_hit);
+        }
       }
     }
     //-----------------------------------------------------------

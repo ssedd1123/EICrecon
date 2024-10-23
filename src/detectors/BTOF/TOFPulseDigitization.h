@@ -33,10 +33,10 @@
 namespace eicrecon {
 
 using TOFPulseDigitizationAlgorithm =
-        algorithms::Algorithm<algorithms::Input<edm4hep::RawTimeSeriesCollection, 
-	                                        edm4hep::SimTrackerHitCollection>,
+        algorithms::Algorithm<algorithms::Input<edm4hep::RawTimeSeriesCollection,
+                                                edm4hep::SimTrackerHitCollection>,
                               algorithms::Output<edm4eic::RawTrackerHitCollection,
-			                         edm4eic::MCRecoTrackerHitAssociationCollection>>;
+                                                 edm4eic::MCRecoTrackerHitAssociationCollection>>;
 
 class TOFPulseDigitization : public TOFPulseDigitizationAlgorithm,
                              public WithPodConfig<TOFHitDigiConfig> {
