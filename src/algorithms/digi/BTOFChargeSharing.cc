@@ -1,26 +1,34 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 // Copyright (C) 2024 Chun Yuen Tsang, Prithwish Tribedy
 //
-// Spread energy desposition from one strip to neighboring strips within sensor boundaries
+// Spread energy deposition from one strip to neighboring strips within sensor boundaries
 
 // Author: Chun Yuen Tsang
 // Date: 10/22/2024
 
-#include "DD4hep/Detector.h"
-#include "DDRec/Surface.h"
-#include "TF1.h"
-#include "TMath.h"
-#include <Evaluator/DD4hepUnits.h>
-#include <TGraph.h>
-#include <bitset>
-#include <fmt/format.h>
-#include <iostream>
+#include <DD4hep/DetElement.h>
+#include <DD4hep/Handle.h>
+#include <DD4hep/Readout.h>
+#include <DD4hep/Segmentations.h>
+#include <DD4hep/Volumes.h>
+#include <Math/GenVector/Cartesian3D.h>
+#include <Math/GenVector/DisplacementVector3D.h>
+#include <Math/SpecFuncMathCore.h>
+#include <TGeoManager.h>
+#include <TGeoMatrix.h>
+#include <TGeoVolume.h>
+#include <algorithms/geo.h>
+#include <edm4hep/Vector3d.h>
+#include <edm4hep/Vector3f.h>
+#include <gsl/pointers>
+#include <stdexcept>
+#include <utility>
 #include <vector>
 
 #include "BTOFChargeSharing.h"
-#include "Math/SpecFunc.h"
+#include "DD4hep/Detector.h"
+#include "TMath.h"
 #include "algorithms/digi/TOFHitDigiConfig.h"
-#include <algorithms/geo.h>
 
 // using namespace dd4hep;
 // using namespace dd4hep::Geometry;
@@ -44,13 +52,13 @@ void BTOFChargeSharing::init() {
 }
 
 void BTOFChargeSharing::_findAllNeighborsInSensor(
-    dd4hep::rec::CellID hitCell, std::shared_ptr<std::vector<dd4hep::rec::CellID>>& ans,
+    dd4hep::rec::CellID hitCell, std::shared_ptr<std::vector<dd4hep::rec::CellID>>& answer,
     std::unordered_set<dd4hep::rec::CellID>& dp) const {
   // use MST to find all neighbor within a sensor
   // I can probably write down the formula by hand, but why do things manually when computer do
   // everything for you?
   const std::vector<std::pair<int, int>> searchDirs{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-  ans->push_back(hitCell);
+  answer->push_back(hitCell);
   dp.insert(hitCell);
 
   auto sensorID = this -> _getSensorID(hitCell);
@@ -81,7 +89,7 @@ void BTOFChargeSharing::_findAllNeighborsInSensor(
       auto testSensorID = _getSensorID(testCell);
       if (testSensorID == sensorID) {
         // inside the same sensor
-        this->_findAllNeighborsInSensor(testCell, ans, dp);
+        this->_findAllNeighborsInSensor(testCell, answer, dp);
       }
     }
   }

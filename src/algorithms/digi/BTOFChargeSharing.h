@@ -1,32 +1,25 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 // Copyright (C) 2024 Chun Yuen Tsang, Prithwish Tribedy
 //
-// Spread energy desposition from one strip to neighboring strips within sensor boundaries
+// Spread energy deposition from one strip to neighboring strips within sensor boundaries
 
 // Author: Chun Yuen Tsang
 // Date: 10/22/2024
 
 #pragma once
 
-#include "TF1.h"
-#include <iostream>
-#include <memory>
-#include <string_view>
-#include <random>
-#include <vector>
-#include <unordered_set>
-
-#include <DD4hep/Detector.h>
+#include <DD4hep/Objects.h>
+#include <DDRec/CellIDPositionConverter.h>
+#include <DDSegmentation/BitFieldCoder.h>
 #include <algorithms/algorithm.h>
-#include <edm4eic/RawTrackerHitCollection.h>
 #include <edm4hep/SimTrackerHitCollection.h>
-#include <podio/ObjectID.h>
-#include <spdlog/spdlog.h>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <unordered_set>
+#include <vector>
 
 #include "DD4hep/Detector.h"
-#include "DDRec/Surface.h"
-#include <DDRec/CellIDPositionConverter.h>
-
 #include "algorithms/digi/TOFHitDigiConfig.h"
 #include "algorithms/interfaces/WithPodConfig.h"
 
@@ -49,7 +42,7 @@ public:
   void process(const Input&, const Output&) const final;
 protected:
   void _findAllNeighborsInSensor(dd4hep::rec::CellID hitCell,
-                                 std::shared_ptr<std::vector<dd4hep::rec::CellID>>& ans,
+                                 std::shared_ptr<std::vector<dd4hep::rec::CellID>>& answer,
                                  std::unordered_set<dd4hep::rec::CellID>& dp) const;
   const dd4hep::rec::CellID _getSensorID(const dd4hep::rec::CellID& hitCell) const;
   double _integralGaus(double mean, double sd, double low_lim, double up_lim) const;
